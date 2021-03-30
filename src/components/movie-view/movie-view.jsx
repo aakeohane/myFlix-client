@@ -18,6 +18,12 @@ export class MovieView extends React.Component {
 
     return (
       <Container>
+      <Link to={'/directors/${movie.Director.Name}'}>
+        <Button variant="link">Director</Button>
+      </Link>
+      <Link to={'/genres/${movie.Genre.Name}'}>
+        <Button variant="link">Genre</Button>
+      </Link>
       <Row className="justify-content-center">
       <Card className="movie-view" style={{ width: "18rem" }} >
         <Card.Img className="movie-poster" variant="top" src={movie.ImagePath} />

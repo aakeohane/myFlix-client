@@ -9,12 +9,22 @@ export function RegistrationView(props) {
   const [password, setPassword] = useState('');
   const [birthday, setBirthday] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
-    console.log(username, email, password, birthday);
-    // Send a request to the server for authentication 
-   
-    props.onRegister('test');
+    axios.post('https://aarons-myflix-db.herokuapp.com/users', {
+      Username: username,
+      Password: password,
+      Email: email,
+      Birthday: birthday
+    })
+    .then(response => {
+      const data = response.data;
+      console.log(data);
+      window.open('/', '_self'); // '_self' opens page in current window
+    })
+    .catch(e => {
+      console.log('error registering the user')
+    })
   };
 
   return (
@@ -65,7 +75,7 @@ export function RegistrationView(props) {
               onChange={e => setBirthday(e.target.value)}
             />
           </Form.Group>
-          <Button type="submit" variant="dark" onClick={handleSubmit}>Submit</Button>
+          <Button type="button" variant="dark" onClick={handleRegister}>Submit</Button>
         </Form>
       </Row>
     // </Container>

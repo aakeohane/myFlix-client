@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Form, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 export function LoginView(props) {
   const [ username, setUsername ] = useState('');
@@ -8,10 +9,22 @@ export function LoginView(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(username, password);
+    // console.log(username, password);
+    // // keeping these lines for updating UI later
+    // props.onLoggedIn(username);
     // Send a request to the server for authentication 
-    // then call props.onLoggedIn(username)
-    props.onLoggedIn(username);
+    axios.post('https://aarons-myflix-db.herokuapp.com/login', {
+      Username: username,
+      Password: password
+    })
+    .then(response => {
+      const data = response.data;
+      // changed from (username) to data bc you need token with username
+      props.onLoggedIn(data);
+    })
+    .catch(e => {
+      console.log('no such user')
+    });
   };
 
   return (
@@ -37,7 +50,7 @@ export function LoginView(props) {
           onChange={e => setPassword(e.target.value)}
         />
       </Form.Group>
-      <Button type="submit" variant="dark" onClick={handleSubmit}>Submit</Button>
+      <Button type="button" variant="dark" onClick={handleSubmit}>Submit</Button>
     </Form>
     </Row>
   );
@@ -47,6 +60,6 @@ LoginView.propTypes = {
   user: PropTypes.shape({
     username: PropTypes.string.isRequired,
     password: PropTypes.string.isRequired
-  }).isRequired,
+  }),
   onLoggedIn: PropTypes.func.isRequired
 };
