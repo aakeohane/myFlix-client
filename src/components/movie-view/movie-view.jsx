@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
-import { Card, Button, Row, Container } from 'react-bootstrap';
+import { Card, Button, Row, Container, Col } from 'react-bootstrap';
 
 export class MovieView extends React.Component {
 
@@ -12,37 +13,37 @@ export class MovieView extends React.Component {
   }
 
   render() {
-    const { movie, onClick } = this.props;
-
-    if (!movie) return null;
-
-    return (
+   const { movie } = this.props;
+    return (    
+      <div className="movie-view">
       <Container>
-      <Link to={'/directors/${movie.Director.Name}'}>
-        <Button variant="link">Director</Button>
-      </Link>
-      <Link to={'/genres/${movie.Genre.Name}'}>
-        <Button variant="link">Genre</Button>
-      </Link>
       <Row className="justify-content-center">
-      <Card className="movie-view" style={{ width: "18rem" }} >
+      <Card style={{ width: "18rem" }} >
         <Card.Img className="movie-poster" variant="top" src={movie.ImagePath} />
         <Card.Title className="movie-title">{movie.Title}</Card.Title>
         <Card.Body>
           <Card.Text className="label-body">Description: {movie.Description}</Card.Text>
-          <Card.Text className="label-body">Director: {movie.Director.Name}</Card.Text>
-          <Card.Text className="label-body">Genre: {movie.Genre.Name}</Card.Text>
+          <Link to={`/directors/${movie.Director.Name}`}>
+            <Card.Text className="label-body">Director: {movie.Director.Name}</Card.Text>
+          </Link>
+          <Link to={`/genres/${movie.Genre.Name}`}>
+            <Card.Text className="label-body">Genre: {movie.Genre.Name}</Card.Text>
+          </Link>
         </Card.Body>
-        <Button type="button" variant="dark" onClick={() => onClick()}>Back</Button>
+        <Link to={`/`}>
+        <Button type="button" variant="dark link" block>Back</Button>
+        </Link>
       </Card>
+
       </Row>
       </Container>
+      </div>
 
       // Work on this later
     //   <Container>
     //   <Row>
     //     <Col>
-    //       <img className="movie-poster" src={movie.ImagePath} />
+    //       <img className="movie-poster" />
     //     </Col>
     //     <Col>
     //       <div className="movie-title">
@@ -64,7 +65,7 @@ export class MovieView extends React.Component {
     //     </Col>
     //   </Row>
     // </Container>
-    );
+   )
   }
 }
 

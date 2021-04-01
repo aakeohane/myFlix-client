@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 import { Form, Button, Container, Row } from 'react-bootstrap';
 
@@ -28,7 +29,7 @@ export function RegistrationView(props) {
   };
 
   return (
-    // <Container>
+    <Container>
       <Row className="justify-content-center">
         <Form className="registration-form">
           <h1 className="registration-header">Create myFlix Account Profile</h1>
@@ -78,7 +79,7 @@ export function RegistrationView(props) {
           <Button type="button" variant="dark" onClick={handleRegister}>Submit</Button>
         </Form>
       </Row>
-    // </Container>
+    </Container>
   );
 }
 

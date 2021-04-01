@@ -10,8 +10,6 @@ export function LoginView(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // console.log(username, password);
-    // // keeping these lines for updating UI later
-    // props.onLoggedIn(username);
     // Send a request to the server for authentication 
     axios.post('https://aarons-myflix-db.herokuapp.com/login', {
       Username: username,
@@ -38,6 +36,7 @@ export function LoginView(props) {
           placeholder="Enter username"
           value={username}
           onChange={e => setUsername(e.target.value)}
+          required
         />
       </Form.Group>
 
@@ -48,6 +47,7 @@ export function LoginView(props) {
           placeholder="Enter password"
           value={password}
           onChange={e => setPassword(e.target.value)}
+          required
         />
       </Form.Group>
       <Button type="button" variant="dark" onClick={handleSubmit}>Submit</Button>
