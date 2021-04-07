@@ -223,9 +223,7 @@ export class ProfileView extends React.Component {
               <Card.Title className='profile-title'>Delete Your Profile</Card.Title>
               <Card.Subtitle className='text-muted'>If you delete your account, it cannot be recovered.</Card.Subtitle>
               <Card.Body>
-                <Button className='button' variant='danger' onClick={(e) => this.deleteAccount(e)}>
-                  Delete Account
-				        </Button>
+                <Button className='button' variant='danger' onClick={(e) => this.deleteAccount(e)}>Delete Account</Button>
               </Card.Body>
             </Card>
           </Tab>
