@@ -1,12 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Container, Card, Button, ListGroup, Col, Row } from 'react-bootstrap';
 import { MovieCard } from '../movie-card/movie-card';
 
-import { Container, Card, Button, ListGroup } from 'react-bootstrap';
-
-
 export class GenreView extends React.Component {
-
   constructor () {
     super();
 
@@ -24,8 +21,7 @@ export class GenreView extends React.Component {
           <Card className="genre-card">
             <Card.Body>
               <Card.Title className="genre-name">{genre.Genre.Name}</Card.Title>
-              <Card.Text className="genre-space">~</Card.Text>
-              <Card.Text className="genre-description">{genre.Genre.Description}</Card.Text>
+              <Card.Text className="genre-description text-muted">{genre.Genre.Description}</Card.Text>
             </Card.Body>
           </Card>
           <Card className="genre-moreMovies">
@@ -33,21 +29,24 @@ export class GenreView extends React.Component {
               <Card.Title className="genre-movies">{genre.Genre.Name} Movies:</Card.Title>
               <ListGroup>
                 <div className="genre-view-movies">
+                  <Row className="justify-content-center">
                   {movies.map((movie) => {
                     if (movie.Genre.Name === genre.Genre.Name) {
-                      return (<MovieCard key={movie._id} movie={movie} />)
+                      return (
+                      <Col className="moviesList" lg="4" md="6" sm="8" xs="10">
+                      <MovieCard key={movie._id} movie={movie} />
+                      </Col>
+                      )
                     }
                   })}
+                  </Row>
                 </div>
               </ListGroup>
             </Card.Body>
-          </Card>
-
-          <Card.Footer className="director-footer">
             <Link to={`/`}>
-              <Button className="returnButton" variant="dark">Return to Movie List</Button>
+              <Button className="returnButton" type="button" block variant="dark">Return to Movie List</Button>
             </Link>
-          </Card.Footer>
+          </Card>
         </Container>
       </div>
     )

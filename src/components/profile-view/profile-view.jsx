@@ -2,7 +2,7 @@ import React from 'react';
 import propTypes from 'prop-types';
 import axios from 'axios';
 import { Link } from 'react-router-dom'
-import { Form, Button, Container, Card, Tabs, Tab } from 'react-bootstrap';
+import { Form, Button, Container, Card, Tabs, Tab, Row } from 'react-bootstrap';
 
 export class ProfileView extends React.Component {
   constructor() {
@@ -46,7 +46,8 @@ export class ProfileView extends React.Component {
     });
   }
 
-  removeFavorite(movie) {
+  removeFavorite(e, movie) {
+    e.preventDefault();
     const username = localStorage.getItem('user');
     const token = localStorage.getItem('token');
 
@@ -64,9 +65,10 @@ export class ProfileView extends React.Component {
 
   deleteAccount() {
     const user = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
     if (confirm('Are you sure you want to unregister?')) {
-      axios.delete(`https://aarons-myflix-db.herokuapp.com/users/${user}`,
-        { headers: { Authorization: `Bearer ${token}` }
+      axios.delete(`https://aarons-myflix-db.herokuapp.com/users/${user}`, {
+        headers: { Authorization: `Bearer ${token}` }
       })
       .then(response => {
         alert(user + ' has been deleted');
@@ -100,16 +102,42 @@ export class ProfileView extends React.Component {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('user');
 
-    axios({
-      method: 'put',
-      url: `${'https://aarons-myflix-db.herokuapp.com/'}users/${username}`,
+    /*Shorthand axios doesnt work??
+    axios.put(`https://aarons-myflix-db.herokuapp.com/users/${username}`, {
       headers: { Authorization: `Bearer ${token}` },
       data: {
         Username: newUsername ? newUsername : this.state.Username,
         Password: newPassword ? newPassword : this.state.Password,
         Email: newEmail ? newEmail : this.state.Email,
         Birthday: newBirthday ? newBirthday : this.state.Birthday,
-      },
+      }
+    })
+    .then((response) => {
+      this.setState({
+        Username: response.data.Username,
+        Password: response.data.Password,
+        Email: response.data.Email,
+        Birthday: response.data.Birthday,
+      });
+      alert('Changes have been saved!');
+      localStorage.setItem('user', this.state.Username);
+      window.open("/", "_self");
+
+    })
+    .catch(function (error) {
+      console.log(error);
+    });*/
+
+    axios({
+      method: 'put',
+      url: `https://aarons-myflix-db.herokuapp.com/users/${username}`,
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        Username: newUsername ? newUsername : this.state.Username,
+        Password: newPassword ? newPassword : this.state.Password,
+        Email: newEmail ? newEmail : this.state.Email,
+        Birthday: newBirthday ? newBirthday : this.state.Birthday,
+      }
     })
       .then((response) => {
         this.setState({
@@ -154,9 +182,10 @@ export class ProfileView extends React.Component {
         <Tabs defaultActiveKey='profile' className='profile-tabs'>
           <Tab className='tab-item' eventKey='profile' title='Profile'>
             <Card className='profile-card' border='dark'>
-              <Card.Title className='profile-title'>{username}'s Favorite Movies</Card.Title>
-              {FavoriteMovies.length === 0 && <div className='card-content'>You don't have any favorite movies yet!</div>}
-              <div className='favorites-container'>
+              <Card.Title className='profile-title ml-2 my-2'>{username}'s Favorite Movies</Card.Title>
+              {FavoriteMovies.length === 0 && <div className='card-content ml-2'>You don't have any favorite movies yet!</div>}
+              <div className='favorites-container ml-2'>
+                <Row className="justify-content-center">
                 {FavoriteMovies.length > 0 &&
                   movies.map((movie) => {
                     if (movie._id === FavoriteMovies.find((favMovie) => favMovie === movie._id)) {
@@ -167,24 +196,23 @@ export class ProfileView extends React.Component {
                               <Card.Img className='favorites-movie' variant="top" src={movie.ImagePath} />
                             </Link>
                             <Card.Body className='movie-card-body'>
-                              <Button size='sm' className='profile-button remove-favorite' variant='dark' onClick={(e) => this.removeFavorite(e, movie._id)}>
+                              <Button size='sm' className='profile-button remove-favorite' variant='danger' onClick={(e) => this.removeFavorite(e, movie._id)}>
                                 Remove
                               </Button>
                             </Card.Body>
                           </Card>
-
                         </div>
-
                       );
                     }
                   })}
+                </Row>
               </div>
             </Card>
           </Tab>
 
           <Tab className='tab-item' eventKey='update' title='Update'>
             <Card className='update-card' border='dark'>
-              <Card.Title className='profile-title'>Update Profile</Card.Title>
+              <Card.Title className='profile-title ml-2 my-2'>Update Profile</Card.Title>
               <Card.Body>
                 <Form noValidate validated={validated} className='update-form' onSubmit={(e) => this.handleUpdate(e, this.Username, this.Password, this.Email, this.Birthday)}>
                   <Form.Group controlId='formBasicUsername'>
@@ -220,8 +248,8 @@ export class ProfileView extends React.Component {
 
           <Tab className='tab-item' eventKey='delete' title='Delete Profile'>
             <Card className='update-card'>
-              <Card.Title className='profile-title'>Delete Your Profile</Card.Title>
-              <Card.Subtitle className='text-muted'>If you delete your account, it cannot be recovered.</Card.Subtitle>
+              <Card.Title className='profile-title ml-2 my-2'>Delete Your Profile</Card.Title>
+              <Card.Subtitle className='text-muted ml-2 my-2'>If you delete your account, it cannot be recovered.</Card.Subtitle>
               <Card.Body>
                 <Button className='button' variant='danger' onClick={(e) => this.deleteAccount(e)}>Delete Account</Button>
               </Card.Body>
@@ -231,6 +259,17 @@ export class ProfileView extends React.Component {
       </Container>
     );
   }
-
-
 }
+
+ProfileView.propTypes = {
+  user: propTypes.shape({
+    FavoriteMovies: propTypes.arrayOf(
+      propTypes.shape({
+        _id: propTypes.string.isRequired
+      })
+    ),
+    Username: propTypes.string.isRequired,
+    Email: propTypes.string.isRequired,
+    Birthday: propTypes.instanceOf(Date),
+  })
+};
