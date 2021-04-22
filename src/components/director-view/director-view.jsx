@@ -33,8 +33,8 @@ export class DirectorView extends React.Component {
                 {movies.map((movie) => {
                   if (movie.Director.Name === director.Director.Name) {
                     return (
-                      <Col className="moviesList" lg="4" md="6" sm="8" xs="10">
-                      <MovieCard key={movie._id} movie={movie} />
+                      <Col className="moviesList" key={movie._id} lg="4" md="6" sm="8" xs="10">
+                      <MovieCard movie={movie} />
                       </Col>
                     )
                   }

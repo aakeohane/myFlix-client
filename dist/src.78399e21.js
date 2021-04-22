@@ -54628,13 +54628,13 @@ function MoviesList(props) {
     className: "justify-content-center"
   }, filteredMovies.map(function (m) {
     return _react.default.createElement(_reactBootstrap.Col, {
+      key: m._id,
       className: "movieList",
       lg: "4",
       md: "6",
       sm: "8",
       xs: "10"
     }, _react.default.createElement(_movieCard.MovieCard, {
-      key: m._id,
       movie: m
     }));
   }))));
@@ -54927,8 +54927,7 @@ function (_React$Component) {
 
     _this = _super.call(this);
     _this.state = {
-      FavoriteMovies: [],
-      favMovie: null
+      favMovie: false
     };
     return _this;
   } // Axios for adding to FavoriteMovies array
@@ -55027,8 +55026,7 @@ MovieView.propTypes = {
     Director: _propTypes.default.shape({
       Name: _propTypes.default.string
     })
-  }).isRequired,
-  onClick: _propTypes.default.func.isRequired
+  }).isRequired
 };
 
 var mapStateToProps = function mapStateToProps(state) {
@@ -55256,13 +55254,13 @@ function (_React$Component) {
       }, movies.map(function (movie) {
         if (movie.Genre.Name === genre.Genre.Name) {
           return _react.default.createElement(_reactBootstrap.Col, {
+            key: movie._id,
             className: "moviesList",
             lg: "4",
             md: "6",
             sm: "8",
             xs: "10"
           }, _react.default.createElement(_movieCard.MovieCard, {
-            key: movie._id,
             movie: movie
           }));
         }
@@ -55769,12 +55767,12 @@ function (_React$Component) {
         if (movie.Director.Name === director.Director.Name) {
           return _react.default.createElement(_reactBootstrap.Col, {
             className: "moviesList",
+            key: movie._id,
             lg: "4",
             md: "6",
             sm: "8",
             xs: "10"
           }, _react.default.createElement(_movieCard.MovieCard, {
-            key: movie._id,
             movie: movie
           }));
         }
@@ -55872,12 +55870,7 @@ function (_React$Component) {
     // call the superclass constructor so react can initialize it
     _this = _super.call(this); // Initialzie the state to an empty object so we can destructure it later
 
-    _this.state = {
-      user: '',
-      register: '' // movies: [],
-      // selectedMovies: ''
-
-    };
+    _this.state = {};
     return _this;
   }
 
@@ -55906,9 +55899,7 @@ function (_React$Component) {
       var accessToken = localStorage.getItem('token');
 
       if (accessToken !== null) {
-        this.setState({
-          user: localStorage.getItem('user')
-        });
+        this.props.setUser(localStorage.getItem('user'));
         this.getMovies(accessToken);
       }
     }
@@ -55923,9 +55914,7 @@ function (_React$Component) {
     key: "onLoggedIn",
     value: function onLoggedIn(authData) {
       console.log(authData);
-      this.setState({
-        user: authData.user.Username
-      });
+      this.props.setUser(authData.user.Username);
       localStorage.setItem('token', authData.token);
       localStorage.setItem('user', authData.user.Username);
       this.getMovies(authData.token);
@@ -55933,9 +55922,7 @@ function (_React$Component) {
   }, {
     key: "onLogout",
     value: function onLogout() {
-      this.setState({
-        user: null
-      });
+      this.props.setUser(null);
       localStorage.removeItem('user');
       localStorage.removeItem('token');
     }
@@ -55943,7 +55930,7 @@ function (_React$Component) {
     key: "onRegister",
     value: function onRegister(register) {
       this.setState({
-        register: register
+        register: true
       });
     }
   }, {
@@ -55967,10 +55954,10 @@ function (_React$Component) {
       // before the movies have been loaded
 
       /*if (!movies) return <div className="main-view"/>;*/
-      var movies = this.props.movies;
-      var _this$state = this.state,
-          user = _this$state.user,
-          register = _this$state.register;
+      var _this$props = this.props,
+          movies = _this$props.movies,
+          user = _this$props.user;
+      var register = this.state.register;
       return _react.default.createElement(_reactRouterDom.BrowserRouter, null, _react.default.createElement("div", {
         className: "main-view"
       }, _react.default.createElement("header", null, _react.default.createElement(_reactBootstrap.Navbar, {
@@ -56028,12 +56015,8 @@ function (_React$Component) {
         path: "/users/:username",
         render: function render(_ref2) {
           var history = _ref2.history;
-          if (!user) return _react.default.createElement(_loginView.LoginView, {
-            onLoggedIn: function onLoggedIn(data) {
-              return _this3.onLoggedIn(data);
-            }
-          });
-          if (movies.length === 0) return;
+          // if (!user) return <LoginView onLoggedIn={(data) => this.onLoggedIn(data)} />;
+          // if (movies.length === 0) return;
           return _react.default.createElement(_profileView.ProfileView, {
             history: history,
             movies: movies
@@ -56137,7 +56120,7 @@ function movies() {
 }
 
 function users() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
@@ -56270,7 +56253,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53359" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60192" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

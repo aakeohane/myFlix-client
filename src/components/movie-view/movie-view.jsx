@@ -14,8 +14,7 @@ export class MovieView extends React.Component {
     super();
 
     this.state = {
-      FavoriteMovies: [],
-      favMovie: null
+      favMovie: false
     };
   }
 
@@ -87,8 +86,7 @@ MovieView.propTypes = {
       Director: PropTypes.shape({
           Name: PropTypes.string,
       }),
-  }).isRequired,
-  onClick: PropTypes.func.isRequired
+  }).isRequired
 };
 
 const mapStateToProps = (state) => ({

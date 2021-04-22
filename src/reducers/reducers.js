@@ -20,7 +20,7 @@ function movies(state = [], action) {
   }
 }
 
-function users(state = '', action) {
+function users(state = null, action) {
   switch(action.type) {
     case SET_USER:
       return action.value;

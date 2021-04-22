@@ -27,10 +27,7 @@ export class MainView extends React.Component {
     
     // Initialzie the state to an empty object so we can destructure it later
     this.state = {
-      user: '',
-      register: ''
-      // movies: [],
-      // selectedMovies: ''
+    
     };
   }
 
@@ -53,9 +50,7 @@ export class MainView extends React.Component {
   componentDidMount() {
     let accessToken = localStorage.getItem('token');
     if (accessToken !== null) {
-      this.setState({
-        user: localStorage.getItem('user'),
-      });
+      this.props.setUser(localStorage.getItem('user'));
       this.getMovies(accessToken);
     }
   }
@@ -68,20 +63,14 @@ export class MainView extends React.Component {
 
   onLoggedIn(authData) {
     console.log(authData)
-    this.setState({
-      user: authData.user.Username
-    });
-
+    this.props.setUser(authData.user.Username);
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.user.Username);
     this.getMovies(authData.token);
   }
 
   onLogout() {
-    this.setState({
-      user: null
-    });
-
+    this.props.setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   }
@@ -89,7 +78,7 @@ export class MainView extends React.Component {
 
   onRegister(register) {
     this.setState({
-      register
+      register: true
     });
   }
 
@@ -109,8 +98,8 @@ export class MainView extends React.Component {
     // before the movies have been loaded
     /*if (!movies) return <div className="main-view"/>;*/
 
-    let { movies } = this.props;
-    let { user, register } = this.state;
+    let { movies, user } = this.props;
+    let { register } = this.state;
 
     return (
       <Router>
@@ -139,8 +128,8 @@ export class MainView extends React.Component {
          }} />
            <Route path="/movies/:movieId" render={({match}) => <MovieView movie={movies.find(m => m._id === match.params.movieId)}/>}/>
            <Route exact path="/users/:username" render={({ history }) => {
-            if (!user) return <LoginView onLoggedIn={(data) => this.onLoggedIn(data)} />;
-            if (movies.length === 0) return;
+            // if (!user) return <LoginView onLoggedIn={(data) => this.onLoggedIn(data)} />;
+            // if (movies.length === 0) return;
             return <ProfileView history={history} movies={movies} />
           }} />
           <Route path="/register" render={() => {
