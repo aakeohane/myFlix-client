@@ -7,7 +7,6 @@ import { Form, Button, Container, Card, Tabs, Tab, Row } from 'react-bootstrap';
 export class ProfileView extends React.Component {
   constructor() {
     super();
-    (this.Username = null), (this.Password = null), (this.Email = null), (this.Birthday = null);
     this.state = {
       Username: null,
       Password: null,

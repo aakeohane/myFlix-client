@@ -7,6 +7,7 @@ import axios from 'axios';
 
 import './movie-view.scss'
 import { connect } from 'react-redux';
+import { setFav } from '../../actions/actions';
 
 export class MovieView extends React.Component {
 
@@ -18,6 +19,8 @@ export class MovieView extends React.Component {
     };
   }
 
+  
+
   // Axios for adding to FavoriteMovies array
   addFavorite(movie) {
     const token = localStorage.getItem('token');
@@ -26,11 +29,8 @@ export class MovieView extends React.Component {
     axios.post(`https://aarons-myflix-db.herokuapp.com/users/${username}/Movies/${movie._id}`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    .then(response => {
+    .then( () => {
       alert(`${movie.Title} added to Favorites`)
-      this.setState({
-        favMovie: true
-      });
     })
     .catch(function(error) {
       console.log(error);
@@ -39,7 +39,7 @@ export class MovieView extends React.Component {
 
   render() {
    const { movie } = this.props;
-   const { favMovie } = this.state;
+  //  const { favMovie } = this.state;
 
     return (    
       <Container>
@@ -47,7 +47,7 @@ export class MovieView extends React.Component {
         <div className="row no-gutters">
           <div className="col-md-4">
             <Card.Img className="movie-poster" src={movie.ImagePath} />
-            {!favMovie && <Button variant="info" type="button" onClick={() => this.addFavorite(movie)} block>Add to favorites</Button>} 
+            <Button variant="info" type="button" onClick={() => this.addFavorite(movie)} block>Add to favorites</Button>
           </div>
           <div className="col-md-8 d-flex flex-column">
             <div className="card-body">
@@ -93,4 +93,4 @@ const mapStateToProps = (state) => ({
   movie: state.movies.list
 });
 
-export default connect(mapStateToProps)(MovieView);
+export default connect(mapStateToProps, { setFav })(MovieView);

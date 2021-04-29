@@ -38188,13 +38188,16 @@ Object.defineProperty(exports, "__esModule", {
 exports.setMovies = setMovies;
 exports.setFilter = setFilter;
 exports.setUser = setUser;
-exports.SET_USER = exports.SET_FILTER = exports.SET_MOVIES = void 0;
+exports.setFav = setFav;
+exports.SET_FAV = exports.SET_USER = exports.SET_FILTER = exports.SET_MOVIES = void 0;
 var SET_MOVIES = 'SET_MOVIES';
 exports.SET_MOVIES = SET_MOVIES;
 var SET_FILTER = 'SET_FILTER';
 exports.SET_FILTER = SET_FILTER;
 var SET_USER = 'SET_USER';
 exports.SET_USER = SET_USER;
+var SET_FAV = 'ADD_FAVORITE';
+exports.SET_FAV = SET_FAV;
 
 function setMovies(value) {
   return {
@@ -38214,6 +38217,14 @@ function setUser(value) {
   return {
     type: SET_USER,
     value: value
+  };
+}
+
+function setFav(value) {
+  return {
+    type: SET_FAV,
+    value: value,
+    payload: res.data
   };
 }
 },{}],"../node_modules/react-bootstrap/node_modules/@babel/runtime/helpers/esm/extends.js":[function(require,module,exports) {
@@ -54889,6 +54900,8 @@ require("./movie-view.scss");
 
 var _reactRedux = require("react-redux");
 
+var _actions = require("../../actions/actions");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -54936,8 +54949,6 @@ function (_React$Component) {
   _createClass(MovieView, [{
     key: "addFavorite",
     value: function addFavorite(movie) {
-      var _this2 = this;
-
       var token = localStorage.getItem('token');
       var username = localStorage.getItem('user');
 
@@ -54945,12 +54956,8 @@ function (_React$Component) {
         headers: {
           Authorization: "Bearer ".concat(token)
         }
-      }).then(function (response) {
+      }).then(function () {
         alert("".concat(movie.Title, " added to Favorites"));
-
-        _this2.setState({
-          favMovie: true
-        });
       }).catch(function (error) {
         console.log(error);
       });
@@ -54958,10 +54965,10 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this2 = this;
 
-      var movie = this.props.movie;
-      var favMovie = this.state.favMovie;
+      var movie = this.props.movie; //  const { favMovie } = this.state;
+
       return _react.default.createElement(_reactBootstrap.Container, null, _react.default.createElement("div", {
         className: "card mb-8"
       }, _react.default.createElement("div", {
@@ -54971,11 +54978,11 @@ function (_React$Component) {
       }, _react.default.createElement(_reactBootstrap.Card.Img, {
         className: "movie-poster",
         src: movie.ImagePath
-      }), !favMovie && _react.default.createElement(_reactBootstrap.Button, {
+      }), _react.default.createElement(_reactBootstrap.Button, {
         variant: "info",
         type: "button",
         onClick: function onClick() {
-          return _this3.addFavorite(movie);
+          return _this2.addFavorite(movie);
         },
         block: true
       }, "Add to favorites")), _react.default.createElement("div", {
@@ -55035,10 +55042,12 @@ var mapStateToProps = function mapStateToProps(state) {
   };
 };
 
-var _default = (0, _reactRedux.connect)(mapStateToProps)(MovieView);
+var _default = (0, _reactRedux.connect)(mapStateToProps, {
+  setFav: _actions.setFav
+})(MovieView);
 
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","react-router-dom":"../node_modules/react-router-dom/esm/react-router-dom.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","axios":"../node_modules/axios/index.js","./movie-view.scss":"components/movie-view/movie-view.scss","react-redux":"../node_modules/react-redux/es/index.js"}],"components/registration-view/registration-view.jsx":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","react-router-dom":"../node_modules/react-router-dom/esm/react-router-dom.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","axios":"../node_modules/axios/index.js","./movie-view.scss":"components/movie-view/movie-view.scss","react-redux":"../node_modules/react-redux/es/index.js","../../actions/actions":"actions/actions.js"}],"components/registration-view/registration-view.jsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -55334,7 +55343,6 @@ function (_React$Component) {
     _classCallCheck(this, ProfileView);
 
     _this = _super.call(this);
-    _this.Username = null, _this.Password = null, _this.Email = null, _this.Birthday = null;
     _this.state = {
       Username: null,
       Password: null,
@@ -55884,9 +55892,6 @@ function (_React$Component) {
           Authorization: "Bearer ".concat(token)
         }
       }).then(function (response) {
-        // Assign the result to the state
-        // this.setState({
-        //   movies: response.data,
         _this2.props.setMovies(response.data);
       }).catch(function (error) {
         console.log(error);
@@ -55904,17 +55909,10 @@ function (_React$Component) {
       }
     }
   }, {
-    key: "onMovieClick",
-    value: function onMovieClick(movie) {
-      this.setState({
-        selectedMovie: movie
-      });
-    }
-  }, {
     key: "onLoggedIn",
     value: function onLoggedIn(authData) {
       console.log(authData);
-      this.props.setUser(authData.user.Username);
+      this.props.setUser(authData.user);
       localStorage.setItem('token', authData.token);
       localStorage.setItem('user', authData.user.Username);
       this.getMovies(authData.token);
@@ -55931,13 +55929,6 @@ function (_React$Component) {
     value: function onRegister(register) {
       this.setState({
         register: true
-      });
-    }
-  }, {
-    key: "onBackButtonClick",
-    value: function onBackButtonClick() {
-      this.setState({
-        selectedMovie: null
       });
     } // this overrides the render() method of the superclass
     // No need to call super(), as it does nothing by default
@@ -56119,12 +56110,25 @@ function movies() {
   }
 }
 
-function users() {
+function user() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
     case _actions.SET_USER:
+      return action.value;
+
+    default:
+      return state;
+  }
+}
+
+function addFav() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case _actions.SET_FAV:
       return action.value;
 
     default:
@@ -56142,7 +56146,8 @@ function users() {
 var moviesApp = (0, _redux.combineReducers)({
   visibilityFilter: visibilityFilter,
   movies: movies,
-  users: users
+  user: user,
+  addFav: addFav
 });
 var _default = moviesApp;
 exports.default = _default;
@@ -56253,7 +56258,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60192" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56885" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

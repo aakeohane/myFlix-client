@@ -26,9 +26,7 @@ export class MainView extends React.Component {
     super();
     
     // Initialzie the state to an empty object so we can destructure it later
-    this.state = {
-    
-    };
+    this.state = {};
   }
 
   getMovies(token) {
@@ -36,9 +34,6 @@ export class MainView extends React.Component {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => {
-      // Assign the result to the state
-      // this.setState({
-      //   movies: response.data,
       this.props.setMovies(response.data);
     })
     .catch(function (error) {
@@ -55,15 +50,9 @@ export class MainView extends React.Component {
     }
   }
 
-  onMovieClick(movie) {
-    this.setState({
-      selectedMovie: movie
-    });
-  }
-
   onLoggedIn(authData) {
     console.log(authData)
-    this.props.setUser(authData.user.Username);
+    this.props.setUser(authData.user);
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.user.Username);
     this.getMovies(authData.token);
@@ -79,12 +68,6 @@ export class MainView extends React.Component {
   onRegister(register) {
     this.setState({
       register: true
-    });
-  }
-
-  onBackButtonClick() {
-    this.setState({
-      selectedMovie: null,
     });
   }
 
@@ -126,7 +109,7 @@ export class MainView extends React.Component {
              if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
              return <MoviesList movies={movies}/>;
          }} />
-           <Route path="/movies/:movieId" render={({match}) => <MovieView movie={movies.find(m => m._id === match.params.movieId)}/>}/>
+           <Route path="/movies/:movieId" render={({match}) => <MovieView  movie={movies.find(m => m._id === match.params.movieId)}/>}/>
            <Route exact path="/users/:username" render={({ history }) => {
             // if (!user) return <LoginView onLoggedIn={(data) => this.onLoggedIn(data)} />;
             // if (movies.length === 0) return;
