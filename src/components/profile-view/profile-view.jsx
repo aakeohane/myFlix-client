@@ -4,46 +4,14 @@ import axios from 'axios';
 import { Link } from 'react-router-dom'
 import { Form, Button, Container, Card, Tabs, Tab, Row } from 'react-bootstrap';
 
+import { connect } from 'react-redux';
+import { setUser } from '../../actions/actions';
+
 export class ProfileView extends React.Component {
   constructor() {
     super();
-    this.state = {
-      Username: null,
-      Password: null,
-      Email: null,
-      Birthday: null,
-      FavoriteMovies: [],
-      validated: null
-    };
   }
 
-  componentDidMount() {
-    const accessToken = localStorage.getItem('token');
-    if (accessToken !==null) {
-      this.getUser(accessToken)
-    }
-  }
-
-  getUser(token) {
-    const username = localStorage.getItem('user');
-
-    axios.get(`https://aarons-myflix-db.herokuapp.com/users/${username}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(response => {
-      console.log(response);
-      this.setState({
-        Username: response.data.Username,
-        Password: response.data.Password,
-        Email: response.data.Email,
-        Birthday: response.data.Birthday,
-        FavoriteMovies: response.data.FavoriteMovies,
-      });
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  }
 
   removeFavorite(e, movie) {
     e.preventDefault();
@@ -53,9 +21,9 @@ export class ProfileView extends React.Component {
     axios.delete(`https://aarons-myflix-db.herokuapp.com/users/${username}/Movies/${movie}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    .then(response => {
+    .then((response) => {
       alert('Movie removed from Favorites');
-      this.componentDidMount();
+      this.props.setUser(response.data)
     })
     .catch(function (error) {
       console.log(error);
@@ -101,31 +69,6 @@ export class ProfileView extends React.Component {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('user');
 
-    /*Shorthand axios doesnt work??
-    axios.put(`https://aarons-myflix-db.herokuapp.com/users/${username}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      data: {
-        Username: newUsername ? newUsername : this.state.Username,
-        Password: newPassword ? newPassword : this.state.Password,
-        Email: newEmail ? newEmail : this.state.Email,
-        Birthday: newBirthday ? newBirthday : this.state.Birthday,
-      }
-    })
-    .then((response) => {
-      this.setState({
-        Username: response.data.Username,
-        Password: response.data.Password,
-        Email: response.data.Email,
-        Birthday: response.data.Birthday,
-      });
-      alert('Changes have been saved!');
-      localStorage.setItem('user', this.state.Username);
-      window.open("/", "_self");
-
-    })
-    .catch(function (error) {
-      console.log(error);
-    });*/
 
     axios({
       method: 'put',
@@ -172,23 +115,20 @@ export class ProfileView extends React.Component {
   }
 
   render() {
-    const { FavoriteMovies, validated } = this.state;
-    const username = localStorage.getItem('user');
-    const { movies } = this.props;
+    const { history, user } = this.props;
 
     return (
       <Container className='profile-view'>
         <Tabs defaultActiveKey='profile' className='profile-tabs'>
           <Tab className='tab-item' eventKey='profile' title='Profile'>
             <Card className='profile-card' border='dark'>
-              <Card.Title className='profile-title ml-2 my-2'>{username}'s Favorite Movies</Card.Title>
-              {FavoriteMovies.length === 0 && <div className='card-content ml-2'>You don't have any favorite movies yet!</div>}
+              <Card.Title className='profile-title ml-2 my-2'>{user.Username}'s Favorite Movies</Card.Title>
+              {user.FavoriteMovies.length === 0 && <div className='card-content ml-2'>You don't have any favorite movies yet!</div>}
               <div className='favorites-container ml-2'>
                 <Row className="justify-content-center">
-                {FavoriteMovies.length > 0 &&
-                  movies.map((movie) => {
-                    if (movie._id === FavoriteMovies.find((favMovie) => favMovie === movie._id)) {
-                      return (
+                {user.FavoriteMovies.length > 0 &&
+                    user.FavoriteMovies.map((movie) =>
+                      (
                         <div key={movie._id}>
                           <Card style={{ width: '16rem', float: 'left' }}>
                             <Link to={`/movies/${movie._id}`}>
@@ -201,9 +141,8 @@ export class ProfileView extends React.Component {
                             </Card.Body>
                           </Card>
                         </div>
-                      );
-                    }
-                  })}
+                      )) 
+                  }
                 </Row>
               </div>
             </Card>
@@ -213,7 +152,7 @@ export class ProfileView extends React.Component {
             <Card className='update-card' border='dark'>
               <Card.Title className='profile-title ml-2 my-2'>Update Profile</Card.Title>
               <Card.Body>
-                <Form noValidate validated={validated} className='update-form' onSubmit={(e) => this.handleUpdate(e, this.Username, this.Password, this.Email, this.Birthday)}>
+                <Form noValidate className='update-form' onSubmit={(e) => this.handleUpdate(e, this.Username, this.Password, this.Email, this.Birthday)}>
                   <Form.Group controlId='formBasicUsername'>
                     <Form.Label className='form-label'>Username</Form.Label>
                     <Form.Control type='text' placeholder='Change Username' onChange={(e) => this.setUsername(e.target.value)} pattern='[a-zA-Z0-9]{5,}' />
@@ -260,15 +199,19 @@ export class ProfileView extends React.Component {
   }
 }
 
-ProfileView.propTypes = {
-  user: propTypes.shape({
-    FavoriteMovies: propTypes.arrayOf(
-      propTypes.shape({
-        _id: propTypes.string.isRequired
-      })
-    ),
-    Username: propTypes.string.isRequired,
-    Email: propTypes.string.isRequired,
-    Birthday: propTypes.instanceOf(Date),
-  })
-};
+// ProfileView.propTypes = {
+//   user: propTypes.shape({
+//     FavoriteMovies: propTypes.arrayOf(
+//       propTypes.shape({
+//         _id: propTypes.string.isRequired
+//       })
+//     ),
+//     Username: propTypes.string.isRequired,
+//     Email: propTypes.string.isRequired,
+//     Birthday: propTypes.instanceOf(Date),
+//   })
+// };
+
+const mapStateToProps = (state) => ({});
+
+export default connect(mapStateToProps, { setUser })(ProfileView);
