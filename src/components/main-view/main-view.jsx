@@ -102,7 +102,7 @@ export class MainView extends React.Component {
     let { movies, user } = this.props;
     let { register } = this.state;
 
-    if ( !user || movies.length === 0 ) return <div>Loading...</div>;
+    // if ( !user || movies.length === 0 ) return <div>Loading...</div>;
 
     return (
       <Router>
@@ -130,7 +130,7 @@ export class MainView extends React.Component {
              return <MoviesList movies={movies}/>;
          }} />
            <Route path="/movies/:movieId" render={({match}) => 
-              console.log(movies.find(m => m._id === match.params.movieId), match.params.movieId) ||
+              // console.log(movies.find(m => m._id === match.params.movieId), match.params.movieId) ||
               <MovieView  
                 movie={movies.find(m => m._id === match.params.movieId)}
                 isFavorite={user.FavoriteMovies.includes(match.params.movieId)}

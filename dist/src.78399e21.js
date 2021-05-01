@@ -55382,26 +55382,16 @@ function (_React$Component) {
 
   }, {
     key: "handleUpdate",
-    value: function handleUpdate(e, newUsername, newPassword, newEmail, newBirthday) {
+    value: function handleUpdate(form) {
       var _this2 = this;
 
-      this.setState({
-        validated: null
-      });
-      var form = e.currentTarget;
-
-      if (form.checkValidity() === false) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.setState({
-          validated: true
-        });
-        return;
-      }
-
-      e.preventDefault();
+      if (!form.checkValidity()) return;
       var token = localStorage.getItem('token');
       var username = localStorage.getItem('user');
+      var newUsername = form[0].value;
+      var newPassword = form[1].value;
+      var newEmail = form[2].value;
+      var newBirthday = form[3].value;
       (0, _axios.default)({
         method: 'put',
         url: "https://aarons-myflix-db.herokuapp.com/users/".concat(username),
@@ -55409,45 +55399,20 @@ function (_React$Component) {
           Authorization: "Bearer ".concat(token)
         },
         data: {
-          Username: newUsername ? newUsername : this.state.Username,
-          Password: newPassword ? newPassword : this.state.Password,
-          Email: newEmail ? newEmail : this.state.Email,
-          Birthday: newBirthday ? newBirthday : this.state.Birthday
+          Username: newUsername,
+          Password: newPassword,
+          Email: newEmail,
+          Birthday: newBirthday
         }
       }).then(function (response) {
-        _this2.setState({
-          Username: response.data.Username,
-          Password: response.data.Password,
-          Email: response.data.Email,
-          Birthday: response.data.Birthday
-        });
+        _this2.props.setUser(response.data);
 
         alert('Changes have been saved!');
         localStorage.setItem('user', _this2.state.Username);
-        window.open("/", "_self");
       }).catch(function (error) {
-        console.log(error);
+        alert("Oops, something went wrong");
+        console.error(error);
       });
-    }
-  }, {
-    key: "setUsername",
-    value: function setUsername(input) {
-      this.Username = input;
-    }
-  }, {
-    key: "setPassword",
-    value: function setPassword(input) {
-      this.Password = input;
-    }
-  }, {
-    key: "setEmail",
-    value: function setEmail(input) {
-      this.Email = input;
-    }
-  }, {
-    key: "setBirthday",
-    value: function setBirthday(input) {
-      this.Birthday = input;
     }
   }, {
     key: "render",
@@ -55514,7 +55479,11 @@ function (_React$Component) {
         noValidate: true,
         className: "update-form",
         onSubmit: function onSubmit(e) {
-          return _this3.handleUpdate(e, _this3.Username, _this3.Password, _this3.Email, _this3.Birthday);
+          e.preventDefault();
+
+          _this3.handleUpdate(e.target).then(function () {
+            history.goBack();
+          });
         }
       }, _react.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formBasicUsername"
@@ -55523,9 +55492,6 @@ function (_React$Component) {
       }, "Username"), _react.default.createElement(_reactBootstrap.Form.Control, {
         type: "text",
         placeholder: "Change Username",
-        onChange: function onChange(e) {
-          return _this3.setUsername(e.target.value);
-        },
         pattern: "[a-zA-Z0-9]{5,}"
       }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid"
@@ -55538,9 +55504,6 @@ function (_React$Component) {
       }, "*")), _react.default.createElement(_reactBootstrap.Form.Control, {
         type: "password",
         placeholder: "Current or New Password",
-        onChange: function onChange(e) {
-          return _this3.setPassword(e.target.value);
-        },
         pattern: ".{5,}"
       }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid"
@@ -55550,10 +55513,7 @@ function (_React$Component) {
         className: "form-label"
       }, "Email"), _react.default.createElement(_reactBootstrap.Form.Control, {
         type: "email",
-        placeholder: "Change Email",
-        onChange: function onChange(e) {
-          return _this3.setEmail(e.target.value);
-        }
+        placeholder: "Change Email"
       }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid"
       }, "Please enter a valid email address.")), _react.default.createElement(_reactBootstrap.Form.Group, {
@@ -55562,10 +55522,7 @@ function (_React$Component) {
         className: "form-label"
       }, "Birthday"), _react.default.createElement(_reactBootstrap.Form.Control, {
         type: "date",
-        placeholder: "Change Birthday",
-        onChange: function onChange(e) {
-          return _this3.setBirthday(e.target.value);
-        }
+        placeholder: "Change Birthday"
       }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid"
       }, "Please enter a valid birthday.")), _react.default.createElement(_reactBootstrap.Button, {
@@ -55904,8 +55861,8 @@ function (_React$Component) {
       var _this$props = this.props,
           movies = _this$props.movies,
           user = _this$props.user;
-      var register = this.state.register;
-      if (!user || movies.length === 0) return _react.default.createElement("div", null, "Loading...");
+      var register = this.state.register; // if ( !user || movies.length === 0 ) return <div>Loading...</div>;
+
       return _react.default.createElement(_reactRouterDom.BrowserRouter, null, _react.default.createElement("div", {
         className: "main-view"
       }, _react.default.createElement("header", null, _react.default.createElement(_reactBootstrap.Navbar, {
@@ -55952,14 +55909,14 @@ function (_React$Component) {
         path: "/movies/:movieId",
         render: function render(_ref) {
           var match = _ref.match;
-          return console.log(movies.find(function (m) {
-            return m._id === match.params.movieId;
-          }), match.params.movieId) || _react.default.createElement(_movieView.default, {
-            movie: movies.find(function (m) {
-              return m._id === match.params.movieId;
-            }),
-            isFavorite: user.FavoriteMovies.includes(match.params.movieId)
-          });
+          return (// console.log(movies.find(m => m._id === match.params.movieId), match.params.movieId) ||
+            _react.default.createElement(_movieView.default, {
+              movie: movies.find(function (m) {
+                return m._id === match.params.movieId;
+              }),
+              isFavorite: user.FavoriteMovies.includes(match.params.movieId)
+            })
+          );
         }
       }), _react.default.createElement(_reactRouterDom.Route, {
         exact: true,
@@ -56210,7 +56167,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58482" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54380" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

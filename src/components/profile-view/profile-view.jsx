@@ -50,68 +50,37 @@ export class ProfileView extends React.Component {
   }
 
   // Update and Validation
-  handleUpdate(e, newUsername, newPassword, newEmail, newBirthday) {
-    this.setState({
-      validated: null,
-    });
-
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.preventDefault();
-      e.stopPropagation();
-      this.setState({
-        validated: true,
-      });
-      return;
-    }
-    e.preventDefault();
+  handleUpdate(form) {
+    if (!form.checkValidity()) return;
 
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('user');
 
+    const newUsername = form[0].value;
+    const newPassword = form[1].value;
+    const newEmail = form[2].value;
+    const newBirthday = form[3].value;
 
     axios({
       method: 'put',
       url: `https://aarons-myflix-db.herokuapp.com/users/${username}`,
       headers: { Authorization: `Bearer ${token}` },
       data: {
-        Username: newUsername ? newUsername : this.state.Username,
-        Password: newPassword ? newPassword : this.state.Password,
-        Email: newEmail ? newEmail : this.state.Email,
-        Birthday: newBirthday ? newBirthday : this.state.Birthday,
+        Username: newUsername,
+        Password: newPassword,
+        Email: newEmail,
+        Birthday: newBirthday,
       }
     })
       .then((response) => {
-        this.setState({
-          Username: response.data.Username,
-          Password: response.data.Password,
-          Email: response.data.Email,
-          Birthday: response.data.Birthday,
-        });
+        this.props.setUser(response.data);
         alert('Changes have been saved!');
         localStorage.setItem('user', this.state.Username);
-        window.open("/", "_self");
-
       })
       .catch(function (error) {
-        console.log(error);
+        alert("Oops, something went wrong")
+        console.error(error);
       });
-  }
-
-  setUsername(input) {
-    this.Username = input;
-  }
-
-  setPassword(input) {
-    this.Password = input;
-  }
-
-  setEmail(input) {
-    this.Email = input;
-  }
-
-  setBirthday(input) {
-    this.Birthday = input;
   }
 
   render() {
@@ -152,27 +121,33 @@ export class ProfileView extends React.Component {
             <Card className='update-card' border='dark'>
               <Card.Title className='profile-title ml-2 my-2'>Update Profile</Card.Title>
               <Card.Body>
-                <Form noValidate className='update-form' onSubmit={(e) => this.handleUpdate(e, this.Username, this.Password, this.Email, this.Birthday)}>
+                <Form noValidate className='update-form' onSubmit={(e) => {
+                  e.preventDefault();
+                  this.handleUpdate(e.target)
+                    .then(() => {
+                      history.goBack()
+                    });
+                }}>
                   <Form.Group controlId='formBasicUsername'>
                     <Form.Label className='form-label'>Username</Form.Label>
-                    <Form.Control type='text' placeholder='Change Username' onChange={(e) => this.setUsername(e.target.value)} pattern='[a-zA-Z0-9]{5,}' />
+                    <Form.Control type='text' placeholder='Change Username' pattern='[a-zA-Z0-9]{5,}' />
                     <Form.Control.Feedback type='invalid'>Please enter a valid username with at least 5 alphanumeric characters.</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group controlId='formBasicPassword'>
                     <Form.Label className='form-label'>
                       Password <span className='required'>*</span>
                     </Form.Label>
-                    <Form.Control type='password' placeholder='Current or New Password' onChange={(e) => this.setPassword(e.target.value)} pattern='.{5,}' />
+                    <Form.Control type='password' placeholder='Current or New Password' pattern='.{5,}' />
                     <Form.Control.Feedback type='invalid'>Please enter a valid password with at least 5 characters.</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group controlId='formBasicEmail'>
                     <Form.Label className='form-label'>Email</Form.Label>
-                    <Form.Control type='email' placeholder='Change Email' onChange={(e) => this.setEmail(e.target.value)} />
+                    <Form.Control type='email' placeholder='Change Email' />
                     <Form.Control.Feedback type='invalid'>Please enter a valid email address.</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group controlId='formBasicBirthday'>
                     <Form.Label className='form-label'>Birthday</Form.Label>
-                    <Form.Control type='date' placeholder='Change Birthday' onChange={(e) => this.setBirthday(e.target.value)} />
+                    <Form.Control type='date' placeholder='Change Birthday' />
                     <Form.Control.Feedback type='invalid'>Please enter a valid birthday.</Form.Control.Feedback>
                   </Form.Group>
                   <Button className='update-profile-button' type='submit' variant='dark'>
