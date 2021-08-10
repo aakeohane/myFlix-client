@@ -5,13 +5,28 @@ import axios from 'axios';
 import { Form, Button, Container, Row } from 'react-bootstrap';
 
 export function RegistrationView(props) {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [birthday, setBirthday] = useState('');
+  const [form, setForm] = useState({})
+  const [ errors, setErrors ] = useState({})
+
+  const setField = (field, value) => {
+    setForm({
+      ...form,
+      [field]: value
+    })
+    // Check and see if errors exist, and remove them from the error object:
+    if ( !!errors[field] ) setErrors({
+      ...errors,
+      [field]: null
+    })
+  }
 
   const handleRegister = (e) => {
     e.preventDefault();
+    const newErrors = findFormErrors()
+    const { username, password, email, birthday } = form
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+    } else {
     axios.post('https://aarons-myflix-db.herokuapp.com/users', {
       Username: username,
       Password: password,
@@ -25,8 +40,24 @@ export function RegistrationView(props) {
     })
     .catch(e => {
       console.log('error registering the user')
+      window.alert("Something went wrong, please try again, username may already be taken")
     })
-  };
+  }};
+
+  const findFormErrors = () => {
+    const { username, password, email } = form
+    const newErrors = {}
+    // username errors
+    if ( !username || username === '' ) newErrors.username = 'cannot be blank!'
+    else if ( username.length < 5 ) newErrors.username = 'name is too short!'
+    // password errors
+    if ( !password || password === '' ) newErrors.password = 'select a password!'
+    else if ( password.length < 5 ) newErrors.password = 'password is too short!'
+    // no email
+    if ( !email || email === '' ) newErrors.email = 'Please enter an email.'
+
+    return newErrors
+}
 
   return (
     <Container>
@@ -39,9 +70,13 @@ export function RegistrationView(props) {
               type="text"
               placeholder="Enter username"
               required
-              value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={e => setField('username', e.target.value)}
+              isInvalid={ errors.username }
+              pattern='[a-zA-Z0-9].{5,}' 
             />
+            <Form.Control.Feedback type='invalid'>
+              Please enter a valid username with at least 5 alphanumeric characters.
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="formBasicEmail">
@@ -50,9 +85,14 @@ export function RegistrationView(props) {
               type="text"
               placeholder="example@gmail.com"
               required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              isInvalid={ errors.email }
+              onChange={e => setField('email', e.target.value)}
             />
+            <Form.Control.Feedback type='invalid'>
+              {/* Please enter a valid username with at least 5 alphanumeric characters. */}
+              {errors.email}
+            </Form.Control.Feedback>
+
           </Form.Group>
 
           <Form.Group controlId="formBasicPassword">
@@ -61,9 +101,11 @@ export function RegistrationView(props) {
               type="password"
               placeholder="Password"
               required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={e => setField('password', e.target.value)}
+              isInvalid={ !!errors.password }
+              pattern='[a-zA-Z0-9].{5,}' 
             />
+            <Form.Control.Feedback type='invalid'>Please enter a valid password with at least 5 alphanumeric characters.</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="formBasicBirthday">
@@ -72,8 +114,7 @@ export function RegistrationView(props) {
               type="date"
               placeholder="MM/DD/YYYY"
               required
-              value={birthday}
-              onChange={e => setBirthday(e.target.value)}
+              onChange={e => setField('birthday', e.target.value)}
             />
           </Form.Group>
           <Button type="button" variant="dark" onClick={handleRegister}>Submit</Button>

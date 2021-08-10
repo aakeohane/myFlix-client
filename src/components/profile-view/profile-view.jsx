@@ -130,7 +130,7 @@ export class ProfileView extends React.Component {
                 }}>
                   <Form.Group controlId='formBasicUsername'>
                     <Form.Label className='form-label'>Username</Form.Label>
-                    <Form.Control type='text' placeholder='Change Username' pattern='[a-zA-Z0-9]{5,}' />
+                    <Form.Control type='text' placeholder='Change Username' pattern='[a-zA-Z0-9]{5,}' title='Must contain at least 5 alphanumeric characters' />
                     <Form.Control.Feedback type='invalid'>Please enter a valid username with at least 5 alphanumeric characters.</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group controlId='formBasicPassword'>

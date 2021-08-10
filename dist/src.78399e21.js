@@ -55059,6 +55059,12 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -55072,41 +55078,61 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function RegistrationView(props) {
-  var _useState = (0, _react.useState)(''),
+  var _useState = (0, _react.useState)({}),
       _useState2 = _slicedToArray(_useState, 2),
-      username = _useState2[0],
-      setUsername = _useState2[1];
+      form = _useState2[0],
+      setForm = _useState2[1];
 
-  var _useState3 = (0, _react.useState)(''),
+  var _useState3 = (0, _react.useState)({}),
       _useState4 = _slicedToArray(_useState3, 2),
-      email = _useState4[0],
-      setEmail = _useState4[1];
+      errors = _useState4[0],
+      setErrors = _useState4[1];
 
-  var _useState5 = (0, _react.useState)(''),
-      _useState6 = _slicedToArray(_useState5, 2),
-      password = _useState6[0],
-      setPassword = _useState6[1];
+  var setField = function setField(field, value) {
+    setForm(_objectSpread(_objectSpread({}, form), {}, _defineProperty({}, field, value))); // Check and see if errors exist, and remove them from the error object:
 
-  var _useState7 = (0, _react.useState)(''),
-      _useState8 = _slicedToArray(_useState7, 2),
-      birthday = _useState8[0],
-      setBirthday = _useState8[1];
+    if (!!errors[field]) setErrors(_objectSpread(_objectSpread({}, errors), {}, _defineProperty({}, field, null)));
+  };
 
   var handleRegister = function handleRegister(e) {
     e.preventDefault();
+    var newErrors = findFormErrors();
+    var username = form.username,
+        password = form.password,
+        email = form.email,
+        birthday = form.birthday;
 
-    _axios.default.post('https://aarons-myflix-db.herokuapp.com/users', {
-      Username: username,
-      Password: password,
-      Email: email,
-      Birthday: birthday
-    }).then(function (response) {
-      var data = response.data;
-      console.log(data);
-      window.open('/', '_self'); // '_self' opens page in current window
-    }).catch(function (e) {
-      console.log('error registering the user');
-    });
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+    } else {
+      _axios.default.post('https://aarons-myflix-db.herokuapp.com/users', {
+        Username: username,
+        Password: password,
+        Email: email,
+        Birthday: birthday
+      }).then(function (response) {
+        var data = response.data;
+        console.log(data);
+        window.open('/', '_self'); // '_self' opens page in current window
+      }).catch(function (e) {
+        console.log('error registering the user');
+        window.alert("Something went wrong, please try again, username may already be taken");
+      });
+    }
+  };
+
+  var findFormErrors = function findFormErrors() {
+    var username = form.username,
+        password = form.password,
+        email = form.email;
+    var newErrors = {}; // username errors
+
+    if (!username || username === '') newErrors.username = 'cannot be blank!';else if (username.length < 5) newErrors.username = 'name is too short!'; // password errors
+
+    if (!password || password === '') newErrors.password = 'select a password!';else if (password.length < 5) newErrors.password = 'password is too short!'; // no email
+
+    if (!email || email === '') newErrors.email = 'Please enter an email.';
+    return newErrors;
   };
 
   return _react.default.createElement(_reactBootstrap.Container, null, _react.default.createElement(_reactBootstrap.Row, {
@@ -55121,39 +55147,46 @@ function RegistrationView(props) {
     type: "text",
     placeholder: "Enter username",
     required: true,
-    value: username,
     onChange: function onChange(e) {
-      return setUsername(e.target.value);
-    }
-  })), _react.default.createElement(_reactBootstrap.Form.Group, {
+      return setField('username', e.target.value);
+    },
+    isInvalid: errors.username,
+    pattern: "[a-zA-Z0-9].{5,}"
+  }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
+    type: "invalid"
+  }, "Please enter a valid username with at least 5 alphanumeric characters.")), _react.default.createElement(_reactBootstrap.Form.Group, {
     controlId: "formBasicEmail"
   }, _react.default.createElement(_reactBootstrap.Form.Label, null, "E-mail Address "), _react.default.createElement(_reactBootstrap.Form.Control, {
     type: "text",
     placeholder: "example@gmail.com",
     required: true,
-    value: email,
+    isInvalid: errors.email,
     onChange: function onChange(e) {
-      return setEmail(e.target.value);
+      return setField('email', e.target.value);
     }
-  })), _react.default.createElement(_reactBootstrap.Form.Group, {
+  }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
+    type: "invalid"
+  }, errors.email)), _react.default.createElement(_reactBootstrap.Form.Group, {
     controlId: "formBasicPassword"
   }, _react.default.createElement(_reactBootstrap.Form.Label, null, "Password "), _react.default.createElement(_reactBootstrap.Form.Control, {
     type: "password",
     placeholder: "Password",
     required: true,
-    value: password,
     onChange: function onChange(e) {
-      return setPassword(e.target.value);
-    }
-  })), _react.default.createElement(_reactBootstrap.Form.Group, {
+      return setField('password', e.target.value);
+    },
+    isInvalid: !!errors.password,
+    pattern: "[a-zA-Z0-9].{5,}"
+  }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
+    type: "invalid"
+  }, "Please enter a valid password with at least 5 alphanumeric characters.")), _react.default.createElement(_reactBootstrap.Form.Group, {
     controlId: "formBasicBirthday"
   }, _react.default.createElement(_reactBootstrap.Form.Label, null, "Birthday"), _react.default.createElement(_reactBootstrap.Form.Control, {
     type: "date",
     placeholder: "MM/DD/YYYY",
     required: true,
-    value: birthday,
     onChange: function onChange(e) {
-      return setBirthday(e.target.value);
+      return setField('birthday', e.target.value);
     }
   })), _react.default.createElement(_reactBootstrap.Button, {
     type: "button",
@@ -55492,7 +55525,8 @@ function (_React$Component) {
       }, "Username"), _react.default.createElement(_reactBootstrap.Form.Control, {
         type: "text",
         placeholder: "Change Username",
-        pattern: "[a-zA-Z0-9]{5,}"
+        pattern: "[a-zA-Z0-9]{5,}",
+        title: "Must contain at least 5 alphanumeric characters"
       }), _react.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid"
       }, "Please enter a valid username with at least 5 alphanumeric characters.")), _react.default.createElement(_reactBootstrap.Form.Group, {
@@ -56167,7 +56201,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54380" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58494" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
