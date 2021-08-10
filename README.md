@@ -4,9 +4,11 @@ The front end or client-side of my myFlix app making use of the existing server-
 
 ## Features ✅
 
+---
+
 **Main View**
 
-- Return a list of ALL movies listed with an image, titel, and description
+- Return a list of ALL movies listed with an image, title, and description
 - Search/filter movies
 - Ability to select a movie for more details
 
@@ -18,7 +20,7 @@ The front end or client-side of my myFlix app making use of the existing server-
 **Login View**
 
 - Allow users to log in with a username and password
-- Allow user to register (username, passwors, email and DOB) with a seperate similar \
+- Allow user to register (username, password, email and DOB) with a seperate similar \
   **registration view**
 - Authentication and authorization into API using basic HTTP authentication and JWT (token-based) authorization
 
@@ -38,6 +40,8 @@ The front end or client-side of my myFlix app making use of the existing server-
 - Allow users to deregister/delete their profile
 - Display users favorite movies
 - Allow users to remove movies from their favorites list
+
+---
 
 ### User Stories
 
@@ -97,4 +101,4 @@ http://localhost:1234/
 
 ### Version
 
-1.0.0
+**_1.0.0_**
