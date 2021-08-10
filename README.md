@@ -1,10 +1,8 @@
 # myFlix React
 
-The front end or client-side of my myFlix app making use of the existing server-side of the myFlix API that I built using **MongoDB**.
+The front end or client-side of my myFlix app making use of the existing server-side of the myFlix API that I built using **MongoDB**. The user interface was making use of the MERN stack to demonstrate my ability to work with **_React_**.
 
 ## Features ✅
-
----
 
 **Main View**
 
