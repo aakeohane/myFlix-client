@@ -9,6 +9,7 @@ The front end or client-side of my myFlix app making use of the existing server-
 - Return a list of ALL movies listed with an image, titel, and description
 - Search/filter movies
 - Ability to select a movie for more details
+- Nope
 
 **Single Movie View**
 
